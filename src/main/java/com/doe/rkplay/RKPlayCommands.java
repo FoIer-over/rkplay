@@ -16,6 +16,7 @@ import java.util.*;
 public class RKPlayCommands {
     
     private static final Map<UUID, DuelRequest> duelRequests = new HashMap<>();
+    private static final long DUEL_REQUEST_TIMEOUT = 60000; // 1分钟超时
     private static final Map<UUID, Team> teams = new HashMap<>();
     private static final Map<UUID, Integer> playerMarks = new HashMap<>();
     private static final int DEFAULT_MARK = 20;
@@ -90,7 +91,7 @@ public class RKPlayCommands {
         duelRequests.put(target.getUuid(), request);
         
         player.sendMessage(Text.literal("已向 " + targetName + " 发起决斗挑战"));
-        target.sendMessage(Text.literal(player.getName().getString() + " 向你发起决斗挑战，输入/rkp duel accept " + player.getName().getString() + " 接受"));
+        target.sendMessage(Text.literal(player.getName().getString() + " 向你发起决斗请求，输入/rkp duel accept " + player.getName().getString() + " 接受 (1分钟内有效)"));
         
         return 1;
     }
@@ -174,8 +175,14 @@ public class RKPlayCommands {
         
         // 检查是否有收到的挑战
         if (duelRequests.containsKey(player.getUuid())) {
+            DuelRequest request = duelRequests.get(player.getUuid());
+            if (System.currentTimeMillis() - request.timestamp > DUEL_REQUEST_TIMEOUT) {
+                player.sendMessage(Text.literal("决斗请求已超时"));
+                duelRequests.remove(player.getUuid());
+                return 1;
+            }
             duelRequests.remove(player.getUuid());
-            player.sendMessage(Text.literal("已拒绝所有收到的决斗挑战"));
+            player.sendMessage(Text.literal("已拒绝所有收到的决斗请求"));
             return 1;
         }
         
