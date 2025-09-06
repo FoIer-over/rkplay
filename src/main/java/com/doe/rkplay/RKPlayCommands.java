@@ -18,6 +18,7 @@ public class RKPlayCommands {
     private static final Map<UUID, DuelRequest> duelRequests = new HashMap<>();
     private static final Map<UUID, Team> teams = new HashMap<>();
     private static final Map<UUID, Integer> playerMarks = new HashMap<>();
+    private static final int DEFAULT_MARK = 20;
     private static final Map<UUID, Set<UUID>> teamInvites = new HashMap<>();
     
     public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
@@ -111,8 +112,8 @@ public class RKPlayCommands {
         }
         
         // 决斗逻辑
-        int challengerMark = playerMarks.getOrDefault(challenger.getUuid(), 0);
-        int targetMark = playerMarks.getOrDefault(player.getUuid(), 0);
+        int challengerMark = playerMarks.getOrDefault(challenger.getUuid(), DEFAULT_MARK);
+        int targetMark = playerMarks.getOrDefault(player.getUuid(), DEFAULT_MARK);
         int totalMark = challengerMark + targetMark;
         
         // 随机决定胜负 (50%概率)
